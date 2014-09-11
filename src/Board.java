@@ -1,4 +1,7 @@
+package test;
+
 import java.awt.Point;
+import java.util.ArrayList;
 
 public class Board{
 
@@ -15,6 +18,17 @@ public class Board{
 
 	public Board(int[][] board){
 		this.board = board;
+		this.zeroPos = findZero();
+	}
+
+	private Point findZero() throws IllegalStateException{
+		for(int i=0; i<board.length; i++){
+			for(int j=0; j<board[i].length; j++){
+				if(board[i][j] == 0)
+					return new Point(i, j);
+			}
+		}
+		throw new IllegalStateException("Zero not found.");
 	}
 
 	public boolean isSolved(){
@@ -30,6 +44,45 @@ public class Board{
 	}
 
 	public Direction[] moveableDirections(){
-		return null;
+		ArrayList<Direction> goodDirs = new ArrayList<Direction>();
+		if(zeroPos.x != 0)
+			goodDirs.add(Direction.RIGHT);
+		if(zeroPos.x != 3)
+			goodDirs.add(Direction.LEFT);
+		if(zeroPos.y != 0)
+			goodDirs.add(Direction.DOWN);
+		if(zeroPos.y != 3)
+			goodDirs.add(Direction.UP);
+
+		return goodDirs.toArray(new Direction[0]);
+	}
+
+	public Board move(Direction d){
+		switch(d){
+			case UP:
+				return swapTile(zeroPos, new Point(zeroPos.x, zeroPos.y-1));
+			case DOWN:
+				return swapTile(zeroPos, new Point(zeroPos.x, zeroPos.y+1));
+			case LEFT:
+				return swapTile(zeroPos, new Point(zeroPos.x-1, zeroPos.y));
+			case RIGHT:
+				return swapTile(zeroPos, new Point(zeroPos.x+1, zeroPos.y));
+		}
+		throw new UnsupportedOperationException("Cannot move in that direction");
+	}
+	
+	private Board swapTile(Point a, Point b){
+		int[][] newBoard = new int[4][4];
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				if(i == a.y && j == a.x)
+					newBoard[i][j] = board[b.y][b.x];
+				else if(i == b.y && j == b.x)
+					newBoard[i][j] = board[a.y][a.x];
+				else
+					newBoard[i][j] = board[i][j];
+			}
+		}
+		return new Board(newBoard);
 	}
 }
