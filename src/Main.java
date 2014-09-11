@@ -1,15 +1,15 @@
-package test;
-
 import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Main{
 	public static void main(String args[]){
 		try{
-			System.out.println(args[0]);
 			Board board = getPuzzle(args[0]);
+			System.out.println(board.toString());
 
+			System.out.println(breadthFirstSearch(board));
 		}
 		catch(ArrayIndexOutOfBoundsException e){
 			System.err.println("Please specify a file with the puzzle.");
@@ -21,10 +21,22 @@ public class Main{
 
 	public static Board getPuzzle(String filePath) throws IOException{
 		Scanner sc = new Scanner(new File(filePath));
-		String json = sc.useDelimiter("\\A").next();
+		sc.useDelimiter("[\n,]");
+		int[][] matrix = new int[4][4];
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				if(sc.hasNext()){
+					matrix[i][j] = sc.nextInt();
+				}
+			}
+		}
 		sc.close();
+		return new Board(matrix);
+	}
 
-		System.out.println(json);
-		return null;
+	public static ArrayList<Board.Direction> breadthFirstSearch(Board board){
+		ArrayList<Board.Direction> a = new ArrayList<Board.Direction>();
+		a.add(Board.Direction.UP);
+		return a;
 	}
 }

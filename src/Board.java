@@ -1,5 +1,3 @@
-package test;
-
 import java.awt.Point;
 import java.util.ArrayList;
 
@@ -7,9 +5,10 @@ public class Board{
 
 	private int[][] board;
 	public enum Direction {UP, DOWN, LEFT, RIGHT}
+	private ArrayList<Direction> solutionPath;
 	private Point zeroPos;
 
-	private int[][] solvedBoard = {
+	private static final int[][] solvedBoard = {
 		{1, 2, 3, 4},
 		{5, 6, 7, 8},
 		{9, 10, 11, 12},
@@ -19,6 +18,13 @@ public class Board{
 	public Board(int[][] board){
 		this.board = board;
 		this.zeroPos = findZero();
+		this.solutionPath = new ArrayList<Direction>();
+	}
+	
+	private Board(int[][] board, ArrayList<Direction> solutionPath){
+		this.board = board;
+		this.zeroPos = findZero();
+		this.solutionPath = solutionPath;
 	}
 
 	private Point findZero() throws IllegalStateException{
@@ -38,7 +44,10 @@ public class Board{
 	public String toString(){
 		String s = "";
 		for(int[] r: this.board){
-			s += r.toString() + "\n";
+			for(int i: r){
+				s += i + " ";
+			}
+			s += "\n";
 		}
 		return s;
 	}
@@ -58,20 +67,25 @@ public class Board{
 	}
 
 	public Board move(Direction d){
+		ArrayList<Direction> thisSolution = this.solutionPath;
 		switch(d){
 			case UP:
-				return swapTile(zeroPos, new Point(zeroPos.x, zeroPos.y-1));
+				thisSolution.add(Direction.UP);
+				return new Board(swapTile(zeroPos, new Point(zeroPos.x, zeroPos.y-1)), thisSolution);
 			case DOWN:
-				return swapTile(zeroPos, new Point(zeroPos.x, zeroPos.y+1));
+				thisSolution.add(Direction.DOWN);
+				return new Board(swapTile(zeroPos, new Point(zeroPos.x, zeroPos.y+1)), thisSolution);
 			case LEFT:
-				return swapTile(zeroPos, new Point(zeroPos.x-1, zeroPos.y));
+				thisSolution.add(Direction.LEFT);
+				return new Board(swapTile(zeroPos, new Point(zeroPos.x-1, zeroPos.y)), thisSolution);
 			case RIGHT:
-				return swapTile(zeroPos, new Point(zeroPos.x+1, zeroPos.y));
+				thisSolution.add(Direction.RIGHT);
+				return new Board(swapTile(zeroPos, new Point(zeroPos.x+1, zeroPos.y)), thisSolution);
 		}
 		throw new UnsupportedOperationException("Cannot move in that direction");
 	}
 	
-	private Board swapTile(Point a, Point b){
+	private int[][] swapTile(Point a, Point b){
 		int[][] newBoard = new int[4][4];
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
@@ -83,6 +97,10 @@ public class Board{
 					newBoard[i][j] = board[i][j];
 			}
 		}
-		return new Board(newBoard);
+		return newBoard;
+	}
+
+	public ArrayList<Direction> getSolutionPath(){
+		return solutionPath;
 	}
 }
