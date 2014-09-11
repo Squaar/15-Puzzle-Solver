@@ -78,7 +78,7 @@ public class Board{
 	}
 
 	public Board move(Direction d){
-		ArrayList<Direction> thisSolution = this.solutionPath;
+		ArrayList<Direction> thisSolution = new ArrayList<Direction>(this.solutionPath);
 		switch(d){
 			case UP:
 				thisSolution.add(Direction.UP);
@@ -113,5 +113,19 @@ public class Board{
 
 	public ArrayList<Direction> getSolutionPath(){
 		return solutionPath;
+	}
+
+	public int[][] getBoard(){
+		return this.board;
+	}
+
+	public boolean equals(Board other){
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				if(this.board[i][j] != other.getBoard()[i][j])
+					return false;
+			}
+		}
+		return true;
 	}
 }

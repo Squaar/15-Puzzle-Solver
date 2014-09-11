@@ -46,16 +46,27 @@ public class Main{
 
 	public static Board breadthFirstSearch(Board board){
 		LinkedList<Board> queue = new LinkedList<Board>();
+		LinkedList<Board> checked = new LinkedList<Board>();
 		queue.add(board);
 		while(queue.size()>0){
 			System.out.println(queue.size());
 			Board currentBoard = queue.remove();
-			if(currentBoard.isSolved())
+			if(currentBoard.isSolved()){
 				return currentBoard;
+			}
+			checked.add(board);
 
 			Board.Direction[] moves = currentBoard.moveableDirections();
-			for(Board.Direction d: moves)
-				queue.add(currentBoard.move(d));
+			for(Board.Direction d: moves){
+				Board newBoard = currentBoard.move(d);
+				boolean found = false;
+				for(Board b: checked){
+					if(b.equals(newBoard))
+						found = true;
+				}
+				if(!found)
+					queue.add(currentBoard.move(d));
+			}
 		}
 		return null; //should never get here
 	}
