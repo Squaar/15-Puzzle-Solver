@@ -43,6 +43,7 @@ public class Main{
 		LinkedList<Board> queue = new LinkedList<Board>();
 		queue.add(board);
 		while(queue.size()>0){
+			System.out.println(queue.size());
 			Board currentBoard = queue.remove();
 			if(currentBoard.isSolved())
 				return currentBoard;
