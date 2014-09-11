@@ -20,6 +20,7 @@ public class Main{
 		}
 
 		Board solution = breadthFirstSearch(board);
+		System.out.println();
 		System.out.println(solution);
 		System.out.println(solution.getSolutionPath());
 	}
@@ -31,7 +32,11 @@ public class Main{
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
 				if(sc.hasNext()){
-					matrix[i][j] = sc.nextInt();
+					String s = sc.next();
+					if(s.equals("_"))
+							matrix[i][j] = 0;
+					else
+						matrix[i][j] = Integer.parseInt(s);
 				}
 			}
 		}

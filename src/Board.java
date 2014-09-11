@@ -53,7 +53,10 @@ public class Board{
 		String s = "";
 		for(int[] r: this.board){
 			for(int i: r){
-				s += i + " ";
+				if(i==0)
+					s += "_ ";
+				else
+					s += i + " ";
 			}
 			s += "\n";
 		}
