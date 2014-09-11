@@ -28,10 +28,11 @@ public class Board{
 	}
 
 	private Point findZero() throws IllegalStateException{
-		for(int i=0; i<board.length; i++){
-			for(int j=0; j<board[i].length; j++){
-				if(board[i][j] == 0)
-					return new Point(i, j);
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				if(board[i][j] == 0){
+					return new Point(j, i);
+				}
 			}
 		}
 		throw new IllegalStateException("Zero not found.");
@@ -54,13 +55,13 @@ public class Board{
 
 	public Direction[] moveableDirections(){
 		ArrayList<Direction> goodDirs = new ArrayList<Direction>();
-		if(zeroPos.x != 0)
-			goodDirs.add(Direction.RIGHT);
 		if(zeroPos.x != 3)
+			goodDirs.add(Direction.RIGHT);
+		if(zeroPos.x != 0)
 			goodDirs.add(Direction.LEFT);
-		if(zeroPos.y != 0)
-			goodDirs.add(Direction.DOWN);
 		if(zeroPos.y != 3)
+			goodDirs.add(Direction.DOWN);
+		if(zeroPos.y != 0)
 			goodDirs.add(Direction.UP);
 
 		return goodDirs.toArray(new Direction[0]);

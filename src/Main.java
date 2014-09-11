@@ -2,21 +2,26 @@ import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Main{
 	public static void main(String args[]){
+		Board board = null;
 		try{
-			Board board = getPuzzle(args[0]);
+			board = getPuzzle(args[0]);
 			System.out.println(board.toString());
-
-			System.out.println(breadthFirstSearch(board));
-		}
+		}		
 		catch(ArrayIndexOutOfBoundsException e){
 			System.err.println("Please specify a file with the puzzle.");
+			System.exit(1);
 		}
 		catch(IOException e){
 			e.printStackTrace();
 		}
+
+		Board solution = breadthFirstSearch(board);
+		System.out.println(solution);
+		System.out.println(solution.getSolutionPath());
 	}
 
 	public static Board getPuzzle(String filePath) throws IOException{
@@ -34,9 +39,18 @@ public class Main{
 		return new Board(matrix);
 	}
 
-	public static ArrayList<Board.Direction> breadthFirstSearch(Board board){
-		ArrayList<Board.Direction> a = new ArrayList<Board.Direction>();
-		a.add(Board.Direction.UP);
-		return a;
+	public static Board breadthFirstSearch(Board board){
+		LinkedList<Board> queue = new LinkedList<Board>();
+		queue.add(board);
+		while(queue.size()>0){
+			Board currentBoard = queue.remove();
+			if(currentBoard.isSolved())
+				return currentBoard;
+
+			Board.Direction[] moves = currentBoard.moveableDirections();
+			for(Board.Direction d: moves)
+				queue.add(currentBoard.move(d));
+		}
+		return null; //should never get here
 	}
 }
