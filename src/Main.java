@@ -1,3 +1,5 @@
+import puzzle.Board;
+
 import java.util.Scanner;
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +11,6 @@ public class Main{
 		Board board = null;
 		try{
 			board = getPuzzle(args[0]);
-			System.out.println(board.toString());
 		}		
 		catch(ArrayIndexOutOfBoundsException e){
 			System.err.println("Please specify a file with the puzzle.");
@@ -20,9 +21,7 @@ public class Main{
 		}
 
 		Board solution = breadthFirstSearch(board);
-		System.out.println();
-		System.out.println(solution);
-		System.out.println(solution.getSolutionPath());
+		printSolution(board, solution);
 	}
 
 	public static Board getPuzzle(String filePath) throws IOException{
@@ -44,12 +43,21 @@ public class Main{
 		return new Board(matrix);
 	}
 
+	public static void printSolution(Board board, Board solution){
+		System.out.println(board);
+
+		for(Board.Direction d: solution.getSolutionPath()){
+			board = board.move(d);
+			System.out.println(d);
+			System.out.println(board);
+		}
+	}
+
 	public static Board breadthFirstSearch(Board board){
 		LinkedList<Board> queue = new LinkedList<Board>();
 		LinkedList<Board> checked = new LinkedList<Board>();
 		queue.add(board);
 		while(queue.size()>0){
-			System.out.println(queue.size());
 			Board currentBoard = queue.remove();
 			if(currentBoard.isSolved()){
 				return currentBoard;
@@ -69,5 +77,9 @@ public class Main{
 			}
 		}
 		return null; //should never get here
+	}
+	public static Board iterativeDepthFirstSearch(Board board){
+		
+		return null;
 	}
 }
