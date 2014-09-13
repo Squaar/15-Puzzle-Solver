@@ -7,5 +7,6 @@ This was written for CS411 - Artificial Intellegence. A short report explaining 
 
 ##To Run
 - Use `ant` to build.
+	- If ant complains about a lib directory just `mkdir lib`.
 - `java -jar mdumfo2_15-solver.jar TILES`
 	- ex. `java -jar mdumfo2_15-solver.jar 1 0 2 4 5 7 3 8 9 6 11 12 13 10 14 15`
