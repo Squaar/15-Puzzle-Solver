@@ -8,23 +8,64 @@ import java.util.LinkedList;
 
 public class Main{
 	public static void main(String args[]){
+		System.out.println("Matt Dumford - mdumfo2@uic.edu\n15-Puzzle Solver\n");
 		Board board = null;
+
+		// read from file version
+		// try{
+		// 	board = getPuzzle(args[0]);
+		// }		
+		// catch(ArrayIndexOutOfBoundsException e){
+		// 	System.err.println("Please specify a file with the puzzle.");
+		// 	System.exit(1);
+		// }
+		// catch(IOException e){
+		// 	e.printStackTrace();
+		// }
+		
+		// args version
 		try{
-			board = getPuzzle(args[0]);
-		}		
+			board = getPuzzleFromArgs(args);
+		}
 		catch(ArrayIndexOutOfBoundsException e){
-			System.err.println("Please specify a file with the puzzle.");
+			System.err.println("Not enough arguments");
 			System.exit(1);
 		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
 
-		Board breadthSolution = breadthFirstSearch(board);
-		printSolution(board, breadthSolution);
-		System.out.println("================================");
-		Board depthSolution = iterativeDepthFirstSearch(board);
-		printSolution(board, depthSolution);
+		try{
+			System.out.println("Breadth First Search:");
+			Board breadthSolution = breadthFirstSearch(board);
+			printSolution(board, breadthSolution);
+		}
+		catch(OutOfMemoryError e){
+			System.out.println("Out of Memory!");
+		}
+		
+		try{
+			System.out.println("================================\nIterative Depth First Search:");
+			Board depthSolution = iterativeDepthFirstSearch(board);
+			printSolution(board, depthSolution);
+		}
+		catch(OutOfMemoryError e){
+			System.out.println("Out of Memory!");
+		}
+	}
+
+	public static Board getPuzzleFromArgs(String args[]){
+		int[][] matrix = new int[4][4];
+		int k = 0;
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				String s = args[k];
+				if(s.equals("_"))
+						matrix[i][j] = 0;
+				else
+					matrix[i][j] = Integer.parseInt(s);
+				k++;
+			}
+		}
+		return new Board(matrix);
+
 	}
 
 	public static Board getPuzzle(String filePath) throws IOException{
