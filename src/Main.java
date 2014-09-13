@@ -13,7 +13,7 @@ public class Main{
 
 		// read from file version
 		// try{
-		// 	board = getPuzzle(args[0]);
+		// 	board = getPuzzleFromFile(args[0]);
 		// }		
 		// catch(ArrayIndexOutOfBoundsException e){
 		// 	System.err.println("Please specify a file with the puzzle.");
@@ -35,16 +35,16 @@ public class Main{
 		try{
 			System.out.println("Breadth First Search:");
 			Board breadthSolution = breadthFirstSearch(board);
-			printSolution(board, breadthSolution);
+			printSolutionUgly(board, breadthSolution);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
 		
 		try{
-			System.out.println("================================\nIterative Depth First Search:");
+			System.out.println("\n\nIterative Depth First Search:");
 			Board depthSolution = iterativeDepthFirstSearch(board);
-			printSolution(board, depthSolution);
+			printSolutionUgly(board, depthSolution);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
@@ -68,7 +68,7 @@ public class Main{
 
 	}
 
-	public static Board getPuzzle(String filePath) throws IOException{
+	public static Board getPuzzleFromFile(String filePath) throws IOException{
 		Scanner sc = new Scanner(new File(filePath));
 		sc.useDelimiter("[\n,]");
 		int[][] matrix = new int[4][4];
@@ -87,13 +87,27 @@ public class Main{
 		return new Board(matrix);
 	}
 
-	public static void printSolution(Board board, Board solution){
+	public static void printSolutionPretty(Board board, Board solution){
 		System.out.println(board);
 
 		for(Board.Direction d: solution.getSolutionPath()){
 			board = board.move(d);
 			System.out.println(d);
 			System.out.println(board);
+		}
+	}
+	
+	public static void printSolutionUgly(Board board, Board solution){
+		for(int i=0; i<4; i++)
+			for(int j=0; j<4; j++)
+				System.out.print(board.getBoard()[i][j] + " ");
+		System.out.println();
+		for(Board.Direction d: solution.getSolutionPath()){
+			board = board.move(d);
+			for(int i=0; i<4; i++)
+				for(int j=0; j<4; j++)
+					System.out.print(board.getBoard()[i][j] + " ");
+			System.out.println();
 		}
 	}
 
