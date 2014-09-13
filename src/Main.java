@@ -20,8 +20,11 @@ public class Main{
 			e.printStackTrace();
 		}
 
-		Board solution = breadthFirstSearch(board);
-		printSolution(board, solution);
+		Board breadthSolution = breadthFirstSearch(board);
+		printSolution(board, breadthSolution);
+		System.out.println("================================");
+		Board depthSolution = iterativeDepthFirstSearch(board);
+		printSolution(board, depthSolution);
 	}
 
 	public static Board getPuzzle(String filePath) throws IOException{
@@ -69,17 +72,48 @@ public class Main{
 				Board newBoard = currentBoard.move(d);
 				boolean found = false;
 				for(Board b: checked){
-					if(b.equals(newBoard))
+					if(b.equals(newBoard)){
 						found = true;
+						break;
+					}
 				}
 				if(!found)
-					queue.add(currentBoard.move(d));
+					queue.add(newBoard);
 			}
 		}
 		return null; //should never get here
 	}
+
 	public static Board iterativeDepthFirstSearch(Board board){
+		int depth = 0;
 		
-		return null;
+		while(true){
+			LinkedList<Board> stack = new LinkedList<Board>();
+			LinkedList<Board> checked = new LinkedList<Board>();
+			stack.push(board);
+
+			while(stack.size()>0){
+				Board currentBoard = stack.pop();
+				if(currentBoard.isSolved())
+					return currentBoard;
+				checked.push(currentBoard);
+
+				Board.Direction[] moves = currentBoard.moveableDirections();
+				for(Board.Direction d: moves){
+					Board newBoard = currentBoard.move(d);
+					boolean found = false;
+					for(Board b: checked){
+						if(b.equals(newBoard)){
+							found = true;
+							break;
+						}
+					}
+					if(!found && newBoard.getSolutionPath().size() < depth){
+						stack.push(newBoard);
+					}
+				}
+			}
+			depth++;
+		}
 	}
 }
