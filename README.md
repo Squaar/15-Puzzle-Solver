@@ -3,7 +3,7 @@
 Matt Dumford - mdumfo2@uic.edu
 
 A program to solve a 15-Puzzle using breadth first search and iterative deepening depth first search.
-This was written for CS411 - Artificial Intellegence. A short report explaining the algorithms used is in 15-solver_report.pdf. The instructions for the assignment are in `instructions.pdf`
+This was written for CS411 - Artificial Intellegence. A short report explaining the algorithms used is in `15-solver_report.pdf`. The instructions for the assignment are in `instructions.pdf`
 
 ##To Run
 - Use `ant` to build.
