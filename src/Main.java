@@ -195,7 +195,6 @@ public class Main{
 		return null; // should never get here
 	}
 
-
 	public Board aStar2(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
