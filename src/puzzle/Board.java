@@ -9,6 +9,8 @@ public class Board{
 	public enum Direction {UP, DOWN, LEFT, RIGHT}
 	private ArrayList<Direction> solutionPath;
 	private Point zeroPos;
+	private int hueristic1;
+	private int hueristic2;
 
 	private static final int[][] solvedBoard = {
 		{1, 2, 3, 4},
@@ -19,25 +21,45 @@ public class Board{
 
 	public Board(int[][] board){
 		this.board = board;
-		this.zeroPos = findZero();
+		this.zeroPos = findTile(0);
 		this.solutionPath = new ArrayList<Direction>();
+		hueristics();
 	}
 	
 	private Board(int[][] board, ArrayList<Direction> solutionPath){
 		this.board = board;
-		this.zeroPos = findZero();
+		this.zeroPos = findTile(0);
 		this.solutionPath = solutionPath;
+		hueristics();
 	}
 
-	private Point findZero() throws IllegalStateException{
+	public int getHueristic1(){
+		return hueristic1;
+	}
+
+	public int getHueristic2(){
+		return hueristic2;
+	}
+
+	private Point findTile(int tile) throws IllegalStateException{
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
-				if(board[i][j] == 0){
+				if(board[i][j] == tile){
 					return new Point(j, i);
 				}
 			}
 		}
 		throw new IllegalStateException("Zero not found.");
+	}
+
+	private Point findSolvedLocation(int tile){
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				if(solvedBoard[i][j] == tile)
+					return new Point(j,i);
+			}
+		}
+		return null; // should never get herre unless something goes super wrong!
 	}
 
 	public boolean isSolved(){
@@ -130,4 +152,24 @@ public class Board{
 		}
 		return true;
 	}
+
+	// how many tiles are out of place,
+	// sum of number of spaces each tile is from the correct spot
+	private void hueristics(){
+		int hueristic1 = 0;
+		int hueristic2 = 0;
+		for(int i=0; i<4; i++){
+			for(int j=0; j<4; j++){
+				if(this.board[i][j] != solvedBoard[i][j]){
+					hueristic1++;
+					Point rightSpot = findSolvedLocation(this.board[i][j]);
+					hueristic2 += Math.abs(rightSpot.y - i) + Math.abs(rightSpot.x - j);
+				}
+			}
+		}
+		this.hueristic1 = hueristic1;
+		this.hueristic2 = hueristic2;
+	}
 }
+
+

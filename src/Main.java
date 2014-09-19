@@ -157,4 +157,51 @@ public class Main{
 			depth++;
 		}
 	}
+
+	public Board aStar1(Board board){
+		ArrayList<Board> fringe = new ArrayList<Board>();
+		fringe.add(board);
+		while(fringe.size() > 0){
+			int min = fringe.get(0).getHueristic1();
+			int minPos = 0;
+			for(int i=0; i<fringe.size(); i++){
+				if(fringe.get(i).getHueristic1() < min){
+					min = fringe.get(i).getHueristic1();
+					minPos = i;
+				}
+			}
+
+			Board expand = fringe.remove(minPos);
+			if(expand.isSolved())
+				return expand;
+			for(Board.Direction d: expand.moveableDirections()){
+				fringe.add(expand.move(d));
+			}
+		}
+		return null; // should never get here
+	}
+
+
+	public Board aStar2(Board board){
+		ArrayList<Board> fringe = new ArrayList<Board>();
+		fringe.add(board);
+		while(fringe.size() > 0){
+			int min = fringe.get(0).getHueristic2();
+			int minPos = 0;
+			for(int i=0; i<fringe.size(); i++){
+				if(fringe.get(i).getHueristic2() < min){
+					min = fringe.get(i).getHueristic2();
+					minPos = i;
+				}
+			}
+
+			Board expand = fringe.remove(minPos);
+			if(expand.isSolved())
+				return expand;
+			for(Board.Direction d: expand.moveableDirections()){
+				fringe.add(expand.move(d));
+			}
+		}
+		return null; // should never get here
+	}
 }
