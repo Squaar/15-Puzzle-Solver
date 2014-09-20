@@ -37,50 +37,57 @@ public class Main{
 			long start = System.nanoTime();
 			Solution solution = breadthFirstSearch(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, solution.solution);
-			System.out.println(duration + ", " + solution.memory);
+			printTable(board, solution, duration);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
+
+		System.gc();
 		
 		try{
 			System.out.println("\n\nIterative Depth First Search:");
 			long start = System.nanoTime();
 			Solution solution = iterativeDepthFirstSearch(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, solution.solution);
-			System.out.println(duration + ", " + solution.memory);
+			printTable(board, solution, duration);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
+
+		System.gc();
 
 		try{
 			System.out.println("\n\nA* Heuristic 1:");
 			long start = System.nanoTime();
 			Solution solution = aStar1(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, solution.solution);
-			System.out.println(solution.expandedNodes);
-			System.out.println(duration + ", " + solution.memory);
+			printTable(board, solution, duration);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
+
+		System.gc();
 
 		try{
 			System.out.println("\n\nA* Heuristic 2:");
 			long start = System.nanoTime();
 			Solution solution = aStar2(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, solution.solution);
-			System.out.println(solution.expandedNodes);
-			System.out.println(duration + ", " + solution.memory);
+			printTable(board, solution, duration);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
+	}
+
+	public static double memoryUsage(){
+		Runtime runtime = Runtime.getRuntime();
+		double total = runtime.totalMemory();
+		double free = runtime.freeMemory();
+		return (total - free) / total * 100;
 	}
 
 	public static Board getPuzzleFromArgs(String args[]){
@@ -119,6 +126,23 @@ public class Main{
 		return new Board(matrix);
 	}
 
+	public static void printTable(Board board, Solution solution, long time){
+		System.out.printf("%-40s | %-15s | %s\n", "Board", "Number of Moves", "Solution");
+		String moves = "";
+		for(Board.Direction d: solution.solution.getSolutionPath())
+			moves += d.toString().substring(0,1);
+		String boardLine = "";
+		for(int[] line: board.getBoard()){
+			for(int tile: line){
+				boardLine += tile + " ";
+			}
+		}
+		System.out.printf("%-40s | %-15s | %s\n", boardLine, moves.length(), moves);
+		System.out.printf("Time (miliseconds): %d\n", time);
+		System.out.printf("Memory Usage: %.2f%%\n", solution.memory);
+		System.out.printf("Expanded Nodes: %d\n", solution.expandedNodes);
+	}
+
 	public static void printSolutionPretty(Board board, Board solution){
 		System.out.println(board);
 
@@ -147,13 +171,15 @@ public class Main{
 		LinkedList<Board> queue = new LinkedList<Board>();
 		LinkedList<Board> checked = new LinkedList<Board>();
 		queue.add(board);
+		int expandedNodes = 0;
 		while(queue.size()>0){
 			Board currentBoard = queue.remove();
 			if(currentBoard.isSolved()){
-				double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
-				return new Solution(currentBoard, memory);
+				// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+				return new Solution(currentBoard, expandedNodes, memoryUsage());
 			}
 			checked.add(board);
+			expandedNodes++;
 
 			Board.Direction[] moves = currentBoard.moveableDirections();
 			for(Board.Direction d: moves){
@@ -174,6 +200,7 @@ public class Main{
 
 	public static Solution iterativeDepthFirstSearch(Board board){
 		int depth = 0;
+		int expandedNodes = 0;
 		
 		while(true){
 			LinkedList<Board> stack = new LinkedList<Board>();
@@ -183,10 +210,11 @@ public class Main{
 			while(stack.size()>0){
 				Board currentBoard = stack.pop();
 				if(currentBoard.isSolved()){
-					double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
-					return new Solution(currentBoard, memory);
+					// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+					return new Solution(currentBoard, expandedNodes, memoryUsage());
 				}
 				checked.push(currentBoard);
+				expandedNodes++;
 
 				Board.Direction[] moves = currentBoard.moveableDirections();
 				for(Board.Direction d: moves){
@@ -223,8 +251,8 @@ public class Main{
 
 			Board expand = fringe.remove(minPos);
 			if(expand.isSolved()){
-				double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
-				return new Solution(expand, expandedNodes, memory);
+				// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+				return new Solution(expand, expandedNodes, memoryUsage());
 			}
 			expandedNodes++;
 			for(Board.Direction d: expand.moveableDirections()){
@@ -250,8 +278,8 @@ public class Main{
 
 			Board expand = fringe.remove(minPos);
 			if(expand.isSolved()){
-				double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
-				return new Solution(expand, expandedNodes, memory);
+				// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+				return new Solution(expand, expandedNodes, memoryUsage());
 			}
 			expandedNodes++;
 			for(Board.Direction d: expand.moveableDirections()){
@@ -267,10 +295,6 @@ public class Main{
 		public double memory;
 		public Solution(Board solution, int expandedNodes, double memory){
 			this.expandedNodes = expandedNodes;
-			this.solution = solution;
-			this.memory = memory;
-		}
-		public Solution(Board solution, double memory){
 			this.solution = solution;
 			this.memory = memory;
 		}
