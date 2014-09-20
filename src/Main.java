@@ -34,8 +34,11 @@ public class Main{
 
 		try{
 			System.out.println("Breadth First Search:");
+			long start = System.nanoTime();
 			Board breadthSolution = breadthFirstSearch(board);
+			long duration = System.nanoTime() - start;
 			printSolutionUgly(board, breadthSolution);
+			System.out.println(duration);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
@@ -43,8 +46,37 @@ public class Main{
 		
 		try{
 			System.out.println("\n\nIterative Depth First Search:");
+			long start = System.nanoTime();
 			Board depthSolution = iterativeDepthFirstSearch(board);
+			long duration = System.nanoTime() - start;
 			printSolutionUgly(board, depthSolution);
+			System.out.println(duration);
+		}
+		catch(OutOfMemoryError e){
+			System.out.println("Out of Memory!");
+		}
+
+		try{
+			System.out.println("\n\nA* Hueristic 1:");
+			long start = System.nanoTime();
+			AStarSolution a1Solution = aStar1(board);
+			long duration = System.nanoTime() - start;
+			printSolutionUgly(board, a1Solution.solution);
+			System.out.println(a1Solution.expandedNodes);
+			System.out.println(duration);
+		}
+		catch(OutOfMemoryError e){
+			System.out.println("Out of Memory!");
+		}
+
+		try{
+			System.out.println("\n\nA* Hueristic 2:");
+			long start = System.nanoTime();
+			AStarSolution a2Solution = aStar2(board);
+			long duration = System.nanoTime() - start;
+			printSolutionUgly(board, a2Solution.solution);
+			System.out.println(a2Solution.expandedNodes);
+			System.out.println(duration);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
@@ -107,7 +139,7 @@ public class Main{
 			for(int i=0; i<4; i++)
 				for(int j=0; j<4; j++)
 					System.out.print(board.getBoard()[i][j] + " ");
-			System.out.println();
+			System.out.println(d);
 		}
 	}
 
@@ -172,9 +204,10 @@ public class Main{
 		}
 	}
 
-	public Board aStar1(Board board){
+	public static AStarSolution aStar1(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
+		int expandedNodes = 0;
 		while(fringe.size() > 0){
 			int min = fringe.get(0).getHueristic1();
 			int minPos = 0;
@@ -187,7 +220,8 @@ public class Main{
 
 			Board expand = fringe.remove(minPos);
 			if(expand.isSolved())
-				return expand;
+				return new AStarSolution(expand, expandedNodes);
+			expandedNodes++;
 			for(Board.Direction d: expand.moveableDirections()){
 				fringe.add(expand.move(d));
 			}
@@ -195,9 +229,10 @@ public class Main{
 		return null; // should never get here
 	}
 
-	public Board aStar2(Board board){
+	public static AStarSolution aStar2(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
+		int expandedNodes = 0;
 		while(fringe.size() > 0){
 			int min = fringe.get(0).getHueristic2();
 			int minPos = 0;
@@ -210,11 +245,22 @@ public class Main{
 
 			Board expand = fringe.remove(minPos);
 			if(expand.isSolved())
-				return expand;
+				return new AStarSolution(expand, expandedNodes);
+			expandedNodes++;
 			for(Board.Direction d: expand.moveableDirections()){
 				fringe.add(expand.move(d));
 			}
 		}
 		return null; // should never get here
 	}
+
+	private static class AStarSolution{
+		public int expandedNodes;
+		public Board solution;
+		public AStarSolution(Board board, int expanded){
+			expandedNodes = expanded;
+			solution = board;
+		}
+	}
 }
+
