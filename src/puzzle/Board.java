@@ -9,8 +9,8 @@ public class Board{
 	public enum Direction {UP, DOWN, LEFT, RIGHT}
 	private ArrayList<Direction> solutionPath;
 	private Point zeroPos;
-	private int hueristic1;
-	private int hueristic2;
+	private int heuristic1;
+	private int heuristic2;
 
 	private static final int[][] solvedBoard = {
 		{1, 2, 3, 4},
@@ -23,22 +23,22 @@ public class Board{
 		this.board = board;
 		this.zeroPos = findTile(0);
 		this.solutionPath = new ArrayList<Direction>();
-		hueristics();
+		heuristics();
 	}
 	
 	private Board(int[][] board, ArrayList<Direction> solutionPath){
 		this.board = board;
 		this.zeroPos = findTile(0);
 		this.solutionPath = solutionPath;
-		hueristics();
+		heuristics();
 	}
 
-	public int getHueristic1(){
-		return hueristic1;
+	public int getHeuristic1(){
+		return heuristic1;
 	}
 
-	public int getHueristic2(){
-		return hueristic2;
+	public int getHeuristic2(){
+		return heuristic2;
 	}
 
 	private Point findTile(int tile) throws IllegalStateException{
@@ -155,20 +155,20 @@ public class Board{
 
 	// how many tiles are out of place,
 	// sum of number of spaces each tile is from the correct spot
-	private void hueristics(){
-		int hueristic1 = 0;
-		int hueristic2 = 0;
+	private void heuristics(){
+		int heuristic1 = 0;
+		int heuristic2 = 0;
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
 				if(this.board[i][j] != solvedBoard[i][j]){
-					hueristic1++;
+					heuristic1++;
 					Point rightSpot = findSolvedLocation(this.board[i][j]);
-					hueristic2 += Math.abs(rightSpot.y - i) + Math.abs(rightSpot.x - j);
+					heuristic2 += Math.abs(rightSpot.y - i) + Math.abs(rightSpot.x - j);
 				}
 			}
 		}
-		this.hueristic1 = hueristic1;
-		this.hueristic2 = hueristic2;
+		this.heuristic1 = heuristic1;
+		this.heuristic2 = heuristic2;
 	}
 }
 

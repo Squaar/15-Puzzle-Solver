@@ -35,10 +35,10 @@ public class Main{
 		try{
 			System.out.println("Breadth First Search:");
 			long start = System.nanoTime();
-			Board breadthSolution = breadthFirstSearch(board);
+			Solution solution = breadthFirstSearch(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, breadthSolution);
-			System.out.println(duration);
+			printSolutionUgly(board, solution.solution);
+			System.out.println(duration + ", " + solution.memory);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
@@ -47,36 +47,36 @@ public class Main{
 		try{
 			System.out.println("\n\nIterative Depth First Search:");
 			long start = System.nanoTime();
-			Board depthSolution = iterativeDepthFirstSearch(board);
+			Solution solution = iterativeDepthFirstSearch(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, depthSolution);
-			System.out.println(duration);
+			printSolutionUgly(board, solution.solution);
+			System.out.println(duration + ", " + solution.memory);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
 
 		try{
-			System.out.println("\n\nA* Hueristic 1:");
+			System.out.println("\n\nA* Heuristic 1:");
 			long start = System.nanoTime();
-			AStarSolution a1Solution = aStar1(board);
+			Solution solution = aStar1(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, a1Solution.solution);
-			System.out.println(a1Solution.expandedNodes);
-			System.out.println(duration);
+			printSolutionUgly(board, solution.solution);
+			System.out.println(solution.expandedNodes);
+			System.out.println(duration + ", " + solution.memory);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
 		}
 
 		try{
-			System.out.println("\n\nA* Hueristic 2:");
+			System.out.println("\n\nA* Heuristic 2:");
 			long start = System.nanoTime();
-			AStarSolution a2Solution = aStar2(board);
+			Solution solution = aStar2(board);
 			long duration = System.nanoTime() - start;
-			printSolutionUgly(board, a2Solution.solution);
-			System.out.println(a2Solution.expandedNodes);
-			System.out.println(duration);
+			printSolutionUgly(board, solution.solution);
+			System.out.println(solution.expandedNodes);
+			System.out.println(duration + ", " + solution.memory);
 		}
 		catch(OutOfMemoryError e){
 			System.out.println("Out of Memory!");
@@ -143,14 +143,15 @@ public class Main{
 		}
 	}
 
-	public static Board breadthFirstSearch(Board board){
+	public static Solution breadthFirstSearch(Board board){
 		LinkedList<Board> queue = new LinkedList<Board>();
 		LinkedList<Board> checked = new LinkedList<Board>();
 		queue.add(board);
 		while(queue.size()>0){
 			Board currentBoard = queue.remove();
 			if(currentBoard.isSolved()){
-				return currentBoard;
+				double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+				return new Solution(currentBoard, memory);
 			}
 			checked.add(board);
 
@@ -171,7 +172,7 @@ public class Main{
 		return null; //should never get here
 	}
 
-	public static Board iterativeDepthFirstSearch(Board board){
+	public static Solution iterativeDepthFirstSearch(Board board){
 		int depth = 0;
 		
 		while(true){
@@ -181,8 +182,10 @@ public class Main{
 
 			while(stack.size()>0){
 				Board currentBoard = stack.pop();
-				if(currentBoard.isSolved())
-					return currentBoard;
+				if(currentBoard.isSolved()){
+					double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+					return new Solution(currentBoard, memory);
+				}
 				checked.push(currentBoard);
 
 				Board.Direction[] moves = currentBoard.moveableDirections();
@@ -204,23 +207,25 @@ public class Main{
 		}
 	}
 
-	public static AStarSolution aStar1(Board board){
+	public static Solution aStar1(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
 		int expandedNodes = 0;
 		while(fringe.size() > 0){
-			int min = fringe.get(0).getHueristic1();
+			int min = fringe.get(0).getHeuristic1();
 			int minPos = 0;
 			for(int i=0; i<fringe.size(); i++){
-				if(fringe.get(i).getHueristic1() < min){
-					min = fringe.get(i).getHueristic1();
+				if(fringe.get(i).getHeuristic1() < min){
+					min = fringe.get(i).getHeuristic1();
 					minPos = i;
 				}
 			}
 
 			Board expand = fringe.remove(minPos);
-			if(expand.isSolved())
-				return new AStarSolution(expand, expandedNodes);
+			if(expand.isSolved()){
+				double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+				return new Solution(expand, expandedNodes, memory);
+			}
 			expandedNodes++;
 			for(Board.Direction d: expand.moveableDirections()){
 				fringe.add(expand.move(d));
@@ -229,23 +234,25 @@ public class Main{
 		return null; // should never get here
 	}
 
-	public static AStarSolution aStar2(Board board){
+	public static Solution aStar2(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
 		int expandedNodes = 0;
 		while(fringe.size() > 0){
-			int min = fringe.get(0).getHueristic2();
+			int min = fringe.get(0).getHeuristic2();
 			int minPos = 0;
 			for(int i=0; i<fringe.size(); i++){
-				if(fringe.get(i).getHueristic2() < min){
-					min = fringe.get(i).getHueristic2();
+				if(fringe.get(i).getHeuristic2() < min){
+					min = fringe.get(i).getHeuristic2();
 					minPos = i;
 				}
 			}
 
 			Board expand = fringe.remove(minPos);
-			if(expand.isSolved())
-				return new AStarSolution(expand, expandedNodes);
+			if(expand.isSolved()){
+				double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
+				return new Solution(expand, expandedNodes, memory);
+			}
 			expandedNodes++;
 			for(Board.Direction d: expand.moveableDirections()){
 				fringe.add(expand.move(d));
@@ -254,12 +261,18 @@ public class Main{
 		return null; // should never get here
 	}
 
-	private static class AStarSolution{
+	private static class Solution{
 		public int expandedNodes;
 		public Board solution;
-		public AStarSolution(Board board, int expanded){
-			expandedNodes = expanded;
-			solution = board;
+		public double memory;
+		public Solution(Board solution, int expandedNodes, double memory){
+			this.expandedNodes = expandedNodes;
+			this.solution = solution;
+			this.memory = memory;
+		}
+		public Solution(Board solution, double memory){
+			this.solution = solution;
+			this.memory = memory;
 		}
 	}
 }
