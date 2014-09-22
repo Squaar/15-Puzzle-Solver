@@ -5,13 +5,15 @@ import java.util.ArrayList;
 
 public class Board{
 
-	private int[][] board;
 	public enum Direction {UP, DOWN, LEFT, RIGHT}
+
+	private int[][] board;
 	private ArrayList<Direction> solutionPath;
 	private Point zeroPos;
 	private int heuristic1;
 	private int heuristic2;
 
+	// a solved board
 	private static final int[][] solvedBoard = {
 		{1, 2, 3, 4},
 		{5, 6, 7, 8},
@@ -26,6 +28,7 @@ public class Board{
 		heuristics();
 	}
 	
+	// constructor used to keep track of solution path
 	private Board(int[][] board, ArrayList<Direction> solutionPath){
 		this.board = board;
 		this.zeroPos = findTile(0);
@@ -41,6 +44,7 @@ public class Board{
 		return heuristic2;
 	}
 
+	// finds the location of a tile in the board
 	private Point findTile(int tile) throws IllegalStateException{
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
@@ -52,6 +56,7 @@ public class Board{
 		throw new IllegalStateException("Zero not found.");
 	}
 
+	// find where a tile should be in a solved board
 	private Point findSolvedLocation(int tile){
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
@@ -62,6 +67,7 @@ public class Board{
 		return null; // should never get herre unless something goes super wrong!
 	}
 
+	// check to see if the board is solved
 	public boolean isSolved(){
 		for(int i=0; i<4; i++){
 			for(int j=0; j<4; j++){
@@ -87,6 +93,7 @@ public class Board{
 		return s;
 	}
 
+	// the valid directions you can move the blank tile
 	public Direction[] moveableDirections(){
 		ArrayList<Direction> goodDirs = new ArrayList<Direction>();
 		if(zeroPos.x != 3)
@@ -101,6 +108,7 @@ public class Board{
 		return goodDirs.toArray(new Direction[0]);
 	}
 
+	// return a new board as a result of moving the blank tile
 	public Board move(Direction d){
 		ArrayList<Direction> thisSolution = new ArrayList<Direction>(this.solutionPath);
 		switch(d){
@@ -120,6 +128,7 @@ public class Board{
 		throw new UnsupportedOperationException("Cannot move in that direction");
 	}
 	
+	// construct the new board for .move()
 	private int[][] swapTile(Point a, Point b){
 		int[][] newBoard = new int[4][4];
 		for(int i=0; i<4; i++){
@@ -135,6 +144,7 @@ public class Board{
 		return newBoard;
 	}
 
+	// get the moves taken to get this board from the original
 	public ArrayList<Direction> getSolutionPath(){
 		return solutionPath;
 	}
@@ -153,8 +163,7 @@ public class Board{
 		return true;
 	}
 
-	// how many tiles are out of place,
-	// sum of number of spaces each tile is from the correct spot
+	// calculate both heuristics
 	private void heuristics(){
 		int heuristic1 = 0;
 		int heuristic2 = 0;

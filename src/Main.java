@@ -11,19 +11,7 @@ public class Main{
 		System.out.println("Matt Dumford - mdumfo2@uic.edu\n15-Puzzle Solver\n");
 		Board board = null;
 
-		// read from file version
-		// try{
-		// 	board = getPuzzleFromFile(args[0]);
-		// }		
-		// catch(ArrayIndexOutOfBoundsException e){
-		// 	System.err.println("Please specify a file with the puzzle.");
-		// 	System.exit(1);
-		// }
-		// catch(IOException e){
-		// 	e.printStackTrace();
-		// }
-		
-		// args version
+		// get board from args
 		try{
 			board = getPuzzleFromArgs(args);
 		}
@@ -32,6 +20,7 @@ public class Main{
 			System.exit(1);
 		}
 
+		// Breadth first search
 		try{
 			System.out.println("Breadth First Search:");
 			long start = System.nanoTime();
@@ -45,6 +34,7 @@ public class Main{
 
 		System.gc();
 		
+		// Iterativly deepening depth first search
 		try{
 			System.out.println("\n\nIterative Depth First Search:");
 			long start = System.nanoTime();
@@ -58,6 +48,7 @@ public class Main{
 
 		System.gc();
 
+		// A* Heuristic 1
 		try{
 			System.out.println("\n\nA* Heuristic 1:");
 			long start = System.nanoTime();
@@ -71,6 +62,7 @@ public class Main{
 
 		System.gc();
 
+		// A* Heuristic 2
 		try{
 			System.out.println("\n\nA* Heuristic 2:");
 			long start = System.nanoTime();
@@ -83,6 +75,7 @@ public class Main{
 		}
 	}
 
+	// get % JVM memory usage
 	public static double memoryUsage(){
 		Runtime runtime = Runtime.getRuntime();
 		double total = runtime.totalMemory();
@@ -90,6 +83,7 @@ public class Main{
 		return (total - free) / total * 100;
 	}
 
+	// parses table to solve from cmd args
 	public static Board getPuzzleFromArgs(String args[]){
 		int[][] matrix = new int[4][4];
 		int k = 0;
@@ -107,6 +101,7 @@ public class Main{
 
 	}
 
+	// reads in a puzzle to solve from a file
 	public static Board getPuzzleFromFile(String filePath) throws IOException{
 		Scanner sc = new Scanner(new File(filePath));
 		sc.useDelimiter("[\n,]");
@@ -126,6 +121,7 @@ public class Main{
 		return new Board(matrix);
 	}
 
+	// Prints solution as a table for HW3
 	public static void printTable(Board board, Solution solution, long time){
 		System.out.printf("%-40s | %-15s | %s\n", "Board", "Number of Moves", "Solution");
 		String moves = "";
@@ -138,14 +134,14 @@ public class Main{
 			}
 		}
 		System.out.printf("%-40s | %-15s | %s\n", boardLine, moves.length(), moves);
-		System.out.printf("Time (miliseconds): %d\n", time);
+		System.out.printf("Time (milliseconds): %d\n", time / 1000000);
 		System.out.printf("Memory Usage: %.2f%%\n", solution.memory);
 		System.out.printf("Expanded Nodes: %d\n", solution.expandedNodes);
 	}
 
+	// Depreciated - prints solution path in board formation
 	public static void printSolutionPretty(Board board, Board solution){
 		System.out.println(board);
-
 		for(Board.Direction d: solution.getSolutionPath()){
 			board = board.move(d);
 			System.out.println(d);
@@ -153,6 +149,7 @@ public class Main{
 		}
 	}
 	
+	// Depreciated - prints solution path, 1 per line
 	public static void printSolutionUgly(Board board, Board solution){
 		for(int i=0; i<4; i++)
 			for(int j=0; j<4; j++)
@@ -167,66 +164,47 @@ public class Main{
 		}
 	}
 
+	// Breadth first search
 	public static Solution breadthFirstSearch(Board board){
 		LinkedList<Board> queue = new LinkedList<Board>();
-		LinkedList<Board> checked = new LinkedList<Board>();
 		queue.add(board);
 		int expandedNodes = 0;
 		while(queue.size()>0){
 			Board currentBoard = queue.remove();
 			if(currentBoard.isSolved()){
-				// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
 				return new Solution(currentBoard, expandedNodes, memoryUsage());
 			}
-			checked.add(board);
 			expandedNodes++;
 
 			Board.Direction[] moves = currentBoard.moveableDirections();
 			for(Board.Direction d: moves){
 				Board newBoard = currentBoard.move(d);
-				boolean found = false;
-				for(Board b: checked){
-					if(b.equals(newBoard)){
-						found = true;
-						break;
-					}
-				}
-				if(!found)
-					queue.add(newBoard);
+				queue.add(newBoard);
 			}
 		}
 		return null; //should never get here
 	}
 
+	// Iteratively deepening depth first search
 	public static Solution iterativeDepthFirstSearch(Board board){
 		int depth = 0;
 		int expandedNodes = 0;
 		
 		while(true){
 			LinkedList<Board> stack = new LinkedList<Board>();
-			LinkedList<Board> checked = new LinkedList<Board>();
 			stack.push(board);
 
 			while(stack.size()>0){
 				Board currentBoard = stack.pop();
 				if(currentBoard.isSolved()){
-					// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
 					return new Solution(currentBoard, expandedNodes, memoryUsage());
 				}
-				checked.push(currentBoard);
 				expandedNodes++;
 
 				Board.Direction[] moves = currentBoard.moveableDirections();
 				for(Board.Direction d: moves){
 					Board newBoard = currentBoard.move(d);
-					boolean found = false;
-					for(Board b: checked){
-						if(b.equals(newBoard)){
-							found = true;
-							break;
-						}
-					}
-					if(!found && newBoard.getSolutionPath().size() < depth){
+					if(newBoard.getSolutionPath().size() < depth){
 						stack.push(newBoard);
 					}
 				}
@@ -235,23 +213,23 @@ public class Main{
 		}
 	}
 
+	// A* search using heuristic 1
 	public static Solution aStar1(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
 		int expandedNodes = 0;
 		while(fringe.size() > 0){
-			int min = fringe.get(0).getHeuristic1();
+			int min = fringe.get(0).getHeuristic1() + fringe.get(0).getSolutionPath().size();
 			int minPos = 0;
 			for(int i=0; i<fringe.size(); i++){
-				if(fringe.get(i).getHeuristic1() < min){
-					min = fringe.get(i).getHeuristic1();
+				if(fringe.get(i).getHeuristic1() + fringe.get(i).getSolutionPath().size() < min){
+					min = fringe.get(i).getHeuristic1() + fringe.get(i).getSolutionPath().size();
 					minPos = i;
 				}
 			}
 
 			Board expand = fringe.remove(minPos);
 			if(expand.isSolved()){
-				// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
 				return new Solution(expand, expandedNodes, memoryUsage());
 			}
 			expandedNodes++;
@@ -262,23 +240,23 @@ public class Main{
 		return null; // should never get here
 	}
 
+	// A* search using heuristic 2
 	public static Solution aStar2(Board board){
 		ArrayList<Board> fringe = new ArrayList<Board>();
 		fringe.add(board);
 		int expandedNodes = 0;
 		while(fringe.size() > 0){
-			int min = fringe.get(0).getHeuristic2();
+			int min = fringe.get(0).getHeuristic2() + fringe.get(0).getSolutionPath().size();
 			int minPos = 0;
 			for(int i=0; i<fringe.size(); i++){
-				if(fringe.get(i).getHeuristic2() < min){
-					min = fringe.get(i).getHeuristic2();
+				if(fringe.get(i).getHeuristic2() + fringe.get(i).getSolutionPath().size() < min){
+					min = fringe.get(i).getHeuristic2() + fringe.get(i).getSolutionPath().size();
 					minPos = i;
 				}
 			}
 
 			Board expand = fringe.remove(minPos);
 			if(expand.isSolved()){
-				// double memory = 100 - Runtime.getRuntime().freeMemory() * 100.0 / Runtime.getRuntime().totalMemory();
 				return new Solution(expand, expandedNodes, memoryUsage());
 			}
 			expandedNodes++;
@@ -289,6 +267,7 @@ public class Main{
 		return null; // should never get here
 	}
 
+	// holds information to be returned by search methods
 	private static class Solution{
 		public int expandedNodes;
 		public Board solution;
